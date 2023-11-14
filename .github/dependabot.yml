@@ -9,19 +9,16 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    assignees:
-      - "eliorerz"
-      - "osherdp"
-    labels:
-      - "approved"
-      - "lgtm"
-      - "ok-to-test"
-      - "dependencies"
-      - "python"
+    labels: ["approved", "lgtm", "ok-to-test", "dependencies", "python"]
+    commit-message:
+      prefix: "NO-ISSUE"
     groups:  # dependabot will only open one PR to update all dependencies
-      python-dependencies:
-        patterns:
-          - "*"
+      python-major-dependencies:
+        update-types: ["major"]
+        exclude-patterns:
+          - "flake8-bugbear"
+      pyhton-minor-dependencies:
+        patterns: ["*"]
         exclude-patterns:
           - "flake8-bugbear"
 
@@ -29,8 +26,18 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "NO-ISSUE"
+    groups:
+      docker:
+        patterns: ["*"]
 
   - package-ecosystem: "terraform"
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "NO-ISSUE"
+    groups:
+      terraform:
+        patterns: ["*"]
