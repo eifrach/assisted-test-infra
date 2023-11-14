@@ -35,7 +35,7 @@ updates:
 
 
   - package-ecosystem: "terraform"
-    directory: "/"
+    directory: "/terraform_files"
     schedule:
       interval: "weekly"
     commit-message:
