@@ -98,7 +98,7 @@ class TerraformController(LibvirtController):
             "libvirt_storage_pool_path": kwargs.get("storage_pool_path", os.path.join(os.getcwd(), "storage_pool")),
             # TODO change to namespace index
             "libvirt_secondary_network_if": self._config.net_asset.libvirt_secondary_network_if,
-            "enable_dhcp": (False if kwargs.get("is_static_ip") else True),
+            "enable_dhcp": (False if kwargs.get("is_static_ip", False) else True),
             "provisioning_cidr": self._config.net_asset.provisioning_cidr,
             "running": self._config.running,
             "single_node_ip": kwargs.get("single_node_ip", ""),
@@ -182,6 +182,7 @@ class TerraformController(LibvirtController):
         master_starting_ip = str(ip_address(ip_network(machine_cidr).network_address) + 10)
         worker_starting_ip = str(ip_address(ip_network(machine_cidr).network_address) + 10 + tfvars["master_count"])
         tfvars["image_path"] = self._entity_config.iso_download_path
+        tfvars["enable_dhcp"] = self._params.enable_dhcp
         tfvars["worker_image_path"] = self._entity_config.worker_iso_download_path or tfvars["image_path"]
         self.master_ips = tfvars["libvirt_master_ips"] = self._create_address_list(
             self._params.master_count, starting_ip_addr=master_starting_ip

@@ -77,7 +77,8 @@ resource "libvirt_network" "net" {
     # Please change the code when the following issue is done:
     # https://github.com/dmacvicar/terraform-provider-libvirt/issues/794
 
-    xslt = file("../limit_ip_dhcp_range.xsl")
+    xslt = var.enable_dhcp == true ? file("../limit_ip_dhcp_range.xsl") : null
+
   }
 }
 
@@ -103,20 +104,20 @@ module "masters" {
   vtpm2          = var.master_vtpm2
   boot_devices   = var.master_boot_devices
 
-  networks = flatten([for net in [
+  networks = flatten([ for net in
+    var.enable_dhcp == true ?  [
     {
           name     = libvirt_network.net.name
           ips      = var.libvirt_master_ips
           macs     = var.libvirt_master_macs
           hostname = var.slave_interfaces ? null : "${var.cluster_name}-master-${count.index}"
-    },
-    {
+    }, {
         name     = libvirt_network.secondary_net.name
         ips      = var.libvirt_secondary_master_ips
         macs     = var.libvirt_secondary_master_macs
         hostname = null
     },
-  ] : [for i in range(var.slave_interfaces ? var.network_interfaces_count : 1) :
+  ] : [] : [for i in range(var.slave_interfaces ? var.network_interfaces_count : 1) :
        {
            name     = net.name
            ips      = var.slave_interfaces ? null : net.ips[count.index]

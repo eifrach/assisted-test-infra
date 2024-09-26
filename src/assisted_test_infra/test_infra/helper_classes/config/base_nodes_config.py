@@ -36,6 +36,7 @@ class BaseNodesConfig(BaseConfig, ABC):
     worker_disk_size_gib: str = None  # disk size in GB.
     worker_disk_count: int = None
     worker_boot_devices: List[str] = None
+    is_static_ip: bool = None
 
     api_vips: List[models.ApiVip] = None
     ingress_vips: List[models.IngressVip] = None
