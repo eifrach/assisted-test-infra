@@ -91,16 +91,16 @@ class TerraformController(LibvirtController):
             "libvirt_network_mtu": kwargs.get("network_mtu", 1500),
             "libvirt_dns_records": kwargs.get("dns_records", {}),
             # TODO change to namespace index
-            "libvirt_network_if": self._config.net_asset.libvirt_network_if,
+                "libvirt_network_if": self._config.net_asset.libvirt_network_if,
             "libvirt_worker_disk": kwargs.get("worker_disk", resources.DEFAULT_WORKER_DISK),
             "libvirt_master_disk": kwargs.get("master_disk", resources.DEFAULT_MASTER_DISK),
             "libvirt_secondary_network_name": consts.TEST_SECONDARY_NETWORK + self._suffix,
             "libvirt_storage_pool_path": kwargs.get("storage_pool_path", os.path.join(os.getcwd(), "storage_pool")),
             # TODO change to namespace index
             "libvirt_secondary_network_if": self._config.net_asset.libvirt_secondary_network_if,
-            "enable_dhcp": (False if kwargs.get("is_static_ip") else True),
             "provisioning_cidr": self._config.net_asset.provisioning_cidr,
             "running": self._config.running,
+            "enable_dhcp": False if kwargs.get("is_static_ip", False) else True,
             "single_node_ip": kwargs.get("single_node_ip", ""),
             "master_disk_count": kwargs.get("master_disk_count", resources.DEFAULT_DISK_COUNT),
             "worker_disk_count": kwargs.get("worker_disk_count", resources.DEFAULT_DISK_COUNT),
@@ -197,6 +197,7 @@ class TerraformController(LibvirtController):
         tfvars["machine_cidr_addresses"] = self.get_all_machine_addresses()
         tfvars["provisioning_cidr_addresses"] = self.get_all_provisioning_addresses()
         tfvars["bootstrap_in_place"] = self._config.bootstrap_in_place
+        tfvars["enable_dhcp"] = self._params.enable_dhcp
         tfvars["api_vips"], tfvars["ingress_vips"] = self._get_vips()
 
         if self._config.base_cluster_domain:
