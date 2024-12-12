@@ -1,4 +1,4 @@
-from consts import GB
+from consts import GB, MiB_UNITS
 
 
 class OperatorType:
@@ -76,15 +76,15 @@ class OperatorResource:
     def get_osc_resource_dict(cls, is_sno: bool) -> dict:
         if not is_sno:
             return cls.get_resource_dict(
-                master_memory=16384,
-                worker_memory=8192,
-                master_vcpu=4,
-                worker_vcpu=2,
+                master_memory=17 * MiB_UNITS,
+                worker_memory=8 * MiB_UNITS,
+                master_vcpu=5,
+                worker_vcpu=3,
             )
         else:
             return cls.get_resource_dict(
-                master_memory=16384,
-                master_vcpu=8,
+                master_memory=16 * MiB_UNITS,
+                master_vcpu=9 * MiB_UNITS,
             )
 
     @classmethod
@@ -116,8 +116,8 @@ class OperatorResource:
             OperatorType.METALLB: cls.get_resource_dict(),
             OperatorType.OPENSHIFT_AI: cls.get_resource_dict(
                 # Note that these requirements are for OpenShift and all its dependencies, in particular ODF.
-                master_memory=40 * 1024,
-                worker_memory=64 * 1024,
+                master_memory=40 * MiB_UNITS,
+                worker_memory=64 * MiB_UNITS,
                 master_vcpu=12,
                 worker_vcpu=20,
                 master_disk=100 * GB,
