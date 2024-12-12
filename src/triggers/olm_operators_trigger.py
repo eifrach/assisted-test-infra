@@ -7,10 +7,17 @@ from triggers.env_trigger import Trigger, Triggerable
 
 
 class OlmOperatorsTrigger(Trigger):
-    def __init__(self, conditions: List[Callable[[Triggerable], bool]], operator: str, is_sno: bool = False):
+    def __init__(
+        self,
+        conditions: List[Callable[[Triggerable], bool]],
+        operator: str,
+        is_sno: bool = False,
+        compact: bool = False,
+    ):
         super().__init__(conditions=conditions, operator=operator)
         self._operator = operator
         self._is_sno = is_sno
+        self._compact = compact
 
     def handle(self, config: Triggerable):
         variables_to_set = self.get_olm_variables(config)
@@ -21,6 +28,8 @@ class OlmOperatorsTrigger(Trigger):
 
         for key in OperatorResource.get_resource_dict().keys():
             with suppress(AttributeError):
-                operator_variables[key] = resource_param(getattr(config, key), key, self._operator, self._is_sno)
+                operator_variables[key] = resource_param(
+                    getattr(config, key), key, self._operator, self._is_sno, self._compact
+                )
 
         return operator_variables
