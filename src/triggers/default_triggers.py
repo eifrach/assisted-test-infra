@@ -68,29 +68,38 @@ _default_triggers = frozendict(
         ),
         "cnv_operator": OlmOperatorsTrigger(conditions=[lambda config: "cnv" in config.olm_operators], operator="cnv"),
         "mtv_operator": OlmOperatorsTrigger(conditions=[lambda config: "mtv" in config.olm_operators], operator="mtv"),
+        "osc_operator": OlmOperatorsTrigger(conditions=[lambda config: "osc" in config.olm_operators], operator="osc"),
         "odf_operator": OlmOperatorsTrigger(conditions=[lambda config: "odf" in config.olm_operators], operator="odf"),
+        "odf_compact_operator": OlmOperatorsTrigger(
+            conditions=[
+                lambda config: "odf" in config.olm_operators,
+                lambda config2: config2.masters_count > 1 and config2.workers_count == 0,
+            ],
+            operator="odf",
+            compact=True,
+        ),
         "lvm_operator": OlmOperatorsTrigger(conditions=[lambda config: "lvm" in config.olm_operators], operator="lvm"),
         "openshift_ai_operator": OlmOperatorsTrigger(
             conditions=[lambda config: "openshift-ai" in config.olm_operators],
             operator="openshift-ai",
+            workers_count=3
         ),
         "sno_mce_operator": OlmOperatorsTrigger(
             conditions=[lambda config: "mce" in config.olm_operators, lambda config2: config2.masters_count == 1],
             operator="mce",
             is_sno=True,
         ),
+        "compact_mce_operator": OlmOperatorsTrigger(
+            conditions=[
+                lambda config: "mce" in config.olm_operators,
+                lambda config2: config2.masters_count > 1 and config2.workers_count == 0,
+            ],
+            operator="mce",
+            compact=True,
+        ),
         "mce_operator": OlmOperatorsTrigger(
             conditions=[lambda config: "mce" in config.olm_operators, lambda config2: config2.masters_count > 1],
             operator="mce",
-        ),
-        "sno_osc_operator": OlmOperatorsTrigger(
-            conditions=[lambda config: "osc" in config.olm_operators, lambda config2: config2.masters_count == 1],
-            operator="osc",
-            is_sno=True,
-        ),
-        "osc_operator": OlmOperatorsTrigger(
-            conditions=[lambda config: "osc" in config.olm_operators, lambda config2: config2.masters_count > 1],
-            operator="osc",
         ),
         "ipxe_boot": Trigger(
             conditions=[lambda config: config.ipxe_boot is True],

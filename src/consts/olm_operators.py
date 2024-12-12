@@ -1,4 +1,4 @@
-from consts import GB
+from consts import GB, MiB_UNITS
 
 
 class OperatorType:
@@ -58,75 +58,59 @@ class OperatorResource:
         }
 
     @classmethod
-    def get_mce_resource_dict(cls, is_sno: bool) -> dict:
-        if not is_sno:
-            return cls.get_resource_dict(
-                master_memory=17000,
-                worker_memory=17000,
-                master_vcpu=8,
-                worker_vcpu=6,
-            )
+    def get_mce_resource_dict(cls, is_sno: bool, compact: bool) -> dict:
+        if compact or is_sno:
+            return cls.get_resource_dict(master_vcpu=8, master_memory=32 * MiB_UNITS)
         else:
             return cls.get_resource_dict(
-                master_memory=33000,
-                master_vcpu=8,
+                worker_memory=16 * MiB_UNITS,
+                worker_vcpu=4,
             )
 
     @classmethod
-    def get_osc_resource_dict(cls, is_sno: bool) -> dict:
-        if not is_sno:
+    def get_odf_resource_dict(cls, is_sno: bool, compact: bool) -> dict:
+        if compact:
             return cls.get_resource_dict(
-                master_memory=16384,
-                worker_memory=8192,
-                master_vcpu=4,
-                worker_vcpu=2,
+                master_vcpu=6,
+                master_memory=16 * MiB_UNITS,
             )
         else:
             return cls.get_resource_dict(
-                master_memory=16384,
-                master_vcpu=8,
+                worker_memory=19 * MiB_UNITS,
+                worker_vcpu=8,
             )
 
     @classmethod
-    def values(cls, is_sno: bool = False) -> dict:
+    def values(cls, is_sno: bool = False, compact: bool = False) -> dict:
         return {
             OperatorType.CNV: cls.get_resource_dict(master_memory=150, worker_memory=360, master_vcpu=4, worker_vcpu=2),
             OperatorType.MTV: cls.get_resource_dict(
-                master_memory=1174, worker_memory=1384, master_vcpu=5, worker_vcpu=3
+                master_memory=1 * MiB_UNITS, worker_memory=1 * MiB_UNITS, master_vcpu=1, worker_vcpu=1
             ),
-            OperatorType.ODF: cls.get_resource_dict(
-                master_memory=24000,
-                worker_memory=24000,
-                master_vcpu=12,
-                worker_vcpu=12,
-                master_disk=10 * GB,
-                worker_disk=25 * GB,
-                master_disk_count=1,
-                worker_disk_count=1,
-                worker_count=4,
-            ),
-            OperatorType.LSO: cls.get_resource_dict(),
             OperatorType.LVM: cls.get_resource_dict(
-                master_memory=1200,
+                master_memory=100,
+                worker_memory=100,
                 master_vcpu=1,
                 worker_vcpu=1,
                 master_disk_count=1,
+                worker_disk_count=1,
             ),
-            OperatorType.MCE: cls.get_mce_resource_dict(is_sno),
-            OperatorType.METALLB: cls.get_resource_dict(),
+            OperatorType.OSC: cls.get_resource_dict(
+                master_memory=1 * MiB_UNITS, worker_memory=1 * MiB_UNITS, master_vcpu=1, worker_vcpu=1
+            ),
             OperatorType.OPENSHIFT_AI: cls.get_resource_dict(
                 # Note that these requirements are for OpenShift and all its dependencies, in particular ODF.
-                master_memory=40 * 1024,
-                worker_memory=64 * 1024,
-                master_vcpu=12,
-                worker_vcpu=20,
-                master_disk=100 * GB,
+                # odf worker_memory = 19, worker_vcpu = 8, worker_disk_count = 1, worker_disk = 100, worker_disk_count=3
+                # openshift AI worker_memory 32, worker_vcpu = 8
+                worker_memory=(32 + 19) * MiB_UNITS,
+                worker_vcpu=8 + 8,
+                worker_disk_count=1,
                 worker_disk=100 * GB,
-                master_disk_count=1,
-                worker_disk_count=2,
-                worker_count=3,
             ),
-            OperatorType.OSC: cls.get_osc_resource_dict(is_sno),
+            OperatorType.LSO: cls.get_resource_dict(),
+            OperatorType.METALLB: cls.get_resource_dict(),
+            OperatorType.MCE: cls.get_mce_resource_dict(is_sno, compact),
+            OperatorType.ODF: cls.get_odf_resource_dict(is_sno, compact),
         }
 
 

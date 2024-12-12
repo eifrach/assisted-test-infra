@@ -92,12 +92,22 @@ def filter_operators_by_type(operators: List[MonitoredOperator], operator_types:
     return list(filter(lambda operator: operator.operator_type in operator_types, operators))
 
 
-def resource_param(base_value: int, resource_name: str, operator: str, is_sno: bool = False):
+def resource_param(
+    base_value: int, resource_name: str, operator: str, is_sno: bool = False, compact: bool = False
+) -> str:
     try:
-        value = base_value
-        resource = consts.OperatorResource.values(is_sno)[operator][resource_name]
-        if value <= resource:
-            value = value + resource
-        return value
+        operator_resource_value = consts.OperatorResource.values(is_sno, compact)[operator][resource_name]
+
+        if resource_name in ["worker_count", "master_count"]:
+            """
+            for nodes, we will consider it as a minimum node required
+            all other resources will be append to the base_value of cluster
+            """
+            if base_value < operator_resource_value:
+                return operator_resource_value
+            else:
+                return base_value
+
+        return base_value + operator_resource_value
     except KeyError as e:
         raise ValueError(f"Unknown operator name {e.args[0]}") from e
